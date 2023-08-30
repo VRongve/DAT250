@@ -39,3 +39,14 @@ with app.app_context():
 
 # Import the routes after the app is configured
 from app import routes  # noqa: E402,F401
+
+
+'''
+First notes:
+- need to add better password
+- do not store password as plain text - hash
+- should not be able to modify someone elses profil
+- restrict allowed file types to uploaded
+- cookies to remember user
+- validate user input in form
+'''
