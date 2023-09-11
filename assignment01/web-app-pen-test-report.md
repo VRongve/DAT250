@@ -4,56 +4,142 @@ run shift+ctrl+v to visualize the markdown in separate window
 
 ## Introduction
 
-## Vaurnabilitie notes:
+Tester: Vegard Rongve
+ 
+Tools and methodology: OWASP Testing Guide
+-   Manual inspection
+-   Code Review
+-   Penetration testing - OWASP Zap
+  
+Application: Social Insescurity
 
-### Weak password
+EXPLOITED -> UTNYTTES
 
-This lets the user create whatever password they want. For example a password could be the letter "A", which can be very easy to break for the attacker by using the brut force technique.
+Phase 1 Passive mode:
+- In this phase the tester tries to understand the applications logic and plays with the application. (The information gathering section explains how to perform a passive mode test)
 
-- Cateogory: A7:Identification and Authentication Failures
-  - Subcategory: Credential Security
-    - Issue: Weak Passwords
-    - Description: Weak passwords refer to passwords that lack the necessary complexity or strength to withstand unauthorized access attempts. These passwords are often easy to guess, predict, or crack using various techniques, such as brute force attacks, dictionary attacks, or common password lists. Weak passwords pose a significant security risk as they can lead to unauthorized access to user accounts, exposing sensitive data, and potentially allowing attackers to compromise the integrity and confidentiality of an application.
+Phase 2 Active mode:
+- In this pahse the tester begins to test using the methodology described in the following sections. The set of active tests have been splite into 11 sub-categories.
+• Information Gathering
+• Configuration and Deployment Management Testing
+• Identity Management Testing
+• Authentication Testing
+• Authorization Testing
+• Session Management Testing
+• Input Validation Testing
+• Error Handling
+• Cryptography
+• Business Logic Testing
+• Client Side Testing
 
-Solution: 
+
+Testing Techniques:
+- Manual inspection
+- Code Review
+  - Remove the guess work of black box testing by looking at what is actually going on in the code.
+  - Examples of issues that are particularly conducive to being found through source code reviews include:
+    - concurrency problems
+    - flawed business logic
+    - access control problems
+    - cryptographic weaknesses as well as backdoors
+    - input validation
+- Penetration testing
+  - Penetration testing has been a common technique used to test 
+network security for many years. It is also commonly known as 
+black box testing or ethical hacking. Penetration testing is essentially the “art” of testing a running application remotely to find 
+security vulnerabilities, without knowing the inner workings of 
+the application itself. 
+  -   Typically, the penetration test team would 
+have access to an application as if they were users. The tester acts 
+like an attacker and attempts to find and exploit vulnerabilities. In 
+many cases the tester will be given a valid account on the system
+
+The need for a balanced approach. Need to use manual and automated testing.
+
+Any security issues that are found will be presented to the system owner with an asseessment of the impact, a proposal for mitigation or a technical solution.
+
+## Vulnerability notes:
+
+# Vulnerability Assessment
+
+### 1. Weak Password
+
+Category: 
+- A07: Identification and Authentication Failures
+
+Descirption: 
+- Users of the application have complete freedom to choose their own passwords, without any strict password policy in place. This means they can even select a single-letter password.
+
+Potential Impact:
+- The potential impact of having a weak password is significant, as an attacker might get hold sensitiv data (depending on the purpose of the application). An attacker can by using for instance the brut force technique relatively easy break the password and get access to a user account (given that the attacker knows the username). 
+
+Affected part of the application:
+-   The affected part is the registration form of the application where the user is setting a password.
+
+Potential Solution: 
 - Enforcing password complexity
 - Educate users about the importance of strong passwords
 - MFA (multi-factor authentication)
+- Lock out mechanism
+  - If an attacker guesses the password wrong multiple times the account should be locked. Reducing the posibiltiy of successfull brut force attacks.
 
-### User enumeration
+### 2.User enumeration
 
-Instead of telling the user that either the password or username entered is wrong, the app tells that the user does not exist or that the password is incorrect. This give the attacker usefull information, by telling him that the user exist, but the password is incorrect. Now the user can continoue continoue with for instance brut force technique on that username. 
+Category: 
+- A07: Identification and Authentication Failures
 
-- Cateogory: A7:Identification and Authentication Failures (NOT SURE IF THIS IS A1 or A7)
-  - Issue: User Enumeration
-  - Description: Attackers can determine valid usernames through differential error messages or other means, which can aid in launching various attacks, including brute force attacks and targeted attacks on known user accounts.
+Description:
+- Interacting with the application allows users to identify valid usernames. When a user enters a valid username during the login process, the application indicates that the password is incorrect. Conversely, if an invalid username is entered, the application informs the user that the user does not exist.
+
+Potential impact:
+- It makes it easier for malicous actors to identify valid usernames. Armed with a list of valid usernames, attackers can launch various credential-based attacks, such as bruce force attacks. 
+- User enumartion can be seen as a privacy violation, as i exposes information about which usernames are registered with the service. 
+
+Affected part of the applicaton:
+- The affected part of the app is the login section. The application provides a notification message in the top of the broweser window when an invalid password or username is entered. 
+
+Potential Solution:
+- The application should ensure consistent error messages or responses regardless of whether the username or password is incorrect
+
+
+### 3. Bypassing access control by modifying URL
+
+Cateogory: 
+- A01:Broken Access Control
+
+Description:
+- By modifying the url, given a valid username, it is possible to login in to the application as that user without entering the password. Given that a valid username is "grong", entering the following in the URL "http://127.0.0.1:5000/stream/grong" will access the app as "grong" and navigate the user to the stream page. 
+
+Potential impact:
+- It allows unauthorized access to an account by simply knowing the username, which could lead to unauthorized data access, account manipulation, or other securtiy risks.
+
+Affected part of the application:
+- The Broken Access Control issue affects the user authentication and authorization system of the application. Specifically, it allows unauthorized access to user accounts by manipulating the URL with a valid username, granting access to the user's account without requiring the correct password.
+
+Potential Solution:
+- ??
+
+### 4. Edit another user's profile
+
+Cateogory: 
+- A01:Broken Access Control
+
+Description:
+- The app is lacking user authentication. Currently an attacker is able to modify anyones profile as long as he knows their username. This can be done by modifying the URL and then pressing the "Edit" button. This lets the attacker change all the "About info" for a user. 
+
+Potential impact:
+
+Affected part of the application:
 
 Solution:
-- The application should ensure consistent error messages or responses regardless of whether the username or password is incorrect, making it more difficult for the attackers to gather information about valid usernames
-
-### Bypassing access control by modifying URL
-
-- Cateogory: A1:Broken Access Control
-  - Issue: Session management
-
-I'm able to login to the app by only modifying the URL. The only thing the user will need is to know a username.
-
-For instance:\
-If I enter the following intot the URL "http://127.0.0.1:5000/stream/th" I will be logged in as th, without entering any password. 
-
-Due to the lack of session management in the app the log out button is also useless. The intention of the button is to log the user out of the app, but due to lack of session management this does not work. Essentially what this button does now is to just bring the user back to the login page. 
-
-Another issue i experience while testing the app is that when clicking on the username of a friend or the username of someone that has commented you post, the app changes the user. I believe the user should not be changed unless the user logs out of the app and a new user logs in.
-
-#### Risk - High
-
-### Authentication
-
-The app is lacking user authentication. Currently an attacker is able to modify anyones profile as long as he knows their username. This can be done by modifying the URL and then pressing the "Edit" button. This lets the attacker change all the "About info" for a user. 
 
 ### File upload
 
 The web app does not give an guidelines for what kind of files that can be uploaded and not. It looks like the app excepts any kind of file extensions. This means that an attacker might potentially upload malicious and dangenrous files. 
+
+Is it possible to upload multiple files? If so, all file types need to be checked.
+
+Limit the number of file types that can be uploaded
 
 - Category: Insecure File Uploads
   - Description: Insecure file uploads refer to vulnerabilities where a web application does not adequately validate, sanitize, or secure user-uploaded files. Attackers can exploit these weaknesses to upload malicious files, potentially compromising the integrity and security of the application and its server.
@@ -70,6 +156,12 @@ The sign up form can be submitted without any data. This should not be allowed. 
 
 I can see through the developer tool in the browser that cross origin is set on the javascripts. Is this a vaulrnabiliti?
 
+### Form edit - data erassed when pressing edit button
+
+### Insecure design
+- Lack of form validation
+- Lack of proper authentication
+- Inadequate data validation
 
 
 ## Black box testing
