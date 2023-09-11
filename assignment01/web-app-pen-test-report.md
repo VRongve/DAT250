@@ -86,7 +86,7 @@ Potential Solution:
 ### 2.User enumeration
 
 Category: 
-- A07: Identification and Authentication Failures
+- A05: Security Misconfiguration
 
 Description:
 - Interacting with the application allows users to identify valid usernames. When a user enters a valid username during the login process, the application indicates that the password is incorrect. Conversely, if an invalid username is entered, the application informs the user that the user does not exist.
@@ -132,6 +132,12 @@ Potential impact:
 Affected part of the application:
 
 Solution:
+
+### 5. Cryptographic Failures
+
+sqlite flat-file. 
+If downloaded it can be queried
+
 
 ### File upload
 
