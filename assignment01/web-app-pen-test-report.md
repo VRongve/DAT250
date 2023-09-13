@@ -170,14 +170,25 @@ The sign up form can be submitted without any data. This should not be allowed. 
 
 ### 8. Form edit - data erassed when pressing edit button
 
-### Insecure design
-- Lack of form validation
-- Lack of proper authentication
-- Inadequate data validation
+### 9. Cross site scripting
+
+I entered <script>winodow.alert("Dangrous attack!!")</script> into the post comment field an submitted it. This is then saved in the server. And when the list of comments is diplayed, which is done everytime the page loads, the script injected is runned. 
+
+This script could potentially be used to create forms where a user might enter sensitive data and sends it to an attacker when saved.
+
+A script can also be used to steal cookies, session tokens etc. 
+
+Solution: form validation
+validate on server side
+
+### 10. Javascript injection
+
+enter in the browser: javascript: alert("Executed");
+If an alert message pops up, javascript injection can be done.
 
 # Vulnerability Exploitation
 
-### 1. Broken Access Control
+### 1. Broken Access Control (path traversal)
 
 #### Step.1 
 I registered two user in the app, "vrongve" and "trongve". After registering the two users, i logged in and updated the about page for "vrongve". 
@@ -197,11 +208,14 @@ If an attacker would enter the following URL "http://127.0.0.1:5000/profile/vron
 
 ### 2. Identification and Authentication Failures
 
-Weak password
+Weak password. Brut force?
 
-### 3. Security Misconfiguration
+### 3. Cross site scripting
 
-User enumuration
+### 4. Cryptographic Failures
+
+Passwords are not hashed
+If attacker gets access to the sqlite file, the attacker will know all the usernames and passwords.
 
 
 ## Black box testing
