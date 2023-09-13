@@ -108,7 +108,7 @@ Cateogory:
 - A01:Broken Access Control
 
 Description:
-- By modifying the url, given a valid username, it is possible to login in to the application as that user without entering the password. Given that a valid username is "grong", entering the following in the URL "http://127.0.0.1:5000/stream/grong" will access the app as "grong" and navigate the user to the stream page. 
+- By modifying the url, given a valid username, it is possible to login in to the application as that user without entering the password. Given that a valid username is for example "grong", entering the following in the URL "http://127.0.0.1:5000/stream/grong" will access the app as "grong" and navigate the user to the stream page. 
 
 Potential impact:
 - It allows unauthorized access to an account by simply knowing the username, which could lead to unauthorized data access, account manipulation, or other securtiy risks.
@@ -125,21 +125,31 @@ Cateogory:
 - A01:Broken Access Control
 
 Description:
-- The app is lacking user authentication. Currently an attacker is able to modify anyones profile as long as he knows their username. This can be done by modifying the URL and then pressing the "Edit" button. This lets the attacker change all the "About info" for a user. 
+- The app is lacking session management. Currently an attacker is able to modify anyones profile by for instance adding the user as friend, and then pressing on the username of that user. By doing so the user will navigate to the profil page of the selected user. Here, a user is able to press the edit button and then modify the profile to another user. 
 
-Potential impact:
+Potential impact: 
+- The potential impact of the describe issue is significant and could have several adverese consequences for the application's security and user data.
+  - Unauthorized profile modification:
+    - Attackers can modify the profiles of others without their consent or proper authorization. This could lead to the unauthorized modification of personal inforamtion or other user-specific data, potentially causing confusion, misinformation, or privacy breach.
+  - Data integrity:
+    - Unauthorized profile modification could result in a loss of data integrity as user profiles may contain critical information related to their identify, preferences, or interactions with the application. This could impact the trustworthiness of the platform.
 
 Affected part of the application:
+- The affected part of the described issue above is the profle page where the user can edit data about their self. 
 
 Solution:
+- Implement session management
 
 ### 5. Cryptographic Failures
 
-sqlite flat-file. 
+- sqlite flat-file. 
 If downloaded it can be queried
 
+- Are password hashed??
 
-### File upload
+
+
+### 6. File upload
 
 The web app does not give an guidelines for what kind of files that can be uploaded and not. It looks like the app excepts any kind of file extensions. This means that an attacker might potentially upload malicious and dangenrous files. 
 
@@ -152,22 +162,46 @@ Limit the number of file types that can be uploaded
 
 
 
-### Form validation
+### 7. Form validation
 
 The app lacks form validation. For example the user might share something without actually writing or uploading anything. A solution would be to restrict the user for publishing their thoughts if for instance the text field is empty. 
 
 The sign up form can be submitted without any data. This should not be allowed. Also a user can be registered without a first name and last name. This should also not be allowed. Form validation will solve this issue.
 
-### Cross origin = "anonymous"
-
-I can see through the developer tool in the browser that cross origin is set on the javascripts. Is this a vaulrnabiliti?
-
-### Form edit - data erassed when pressing edit button
+### 8. Form edit - data erassed when pressing edit button
 
 ### Insecure design
 - Lack of form validation
 - Lack of proper authentication
 - Inadequate data validation
+
+# Vulnerability Exploitation
+
+### 1. Broken Access Control
+
+#### Step.1 
+I registered two user in the app, "vrongve" and "trongve". After registering the two users, i logged in and updated the about page for "vrongve". 
+
+#### Step.2
+After updating the user profile for "vrongve" i logged out of the app by cliking the Log Out button. Then i logged in as "trongve" and pressed the friends page where i added the user "vrongve" as a friend. 
+
+#### Step.3
+After seeing that "vrongve" appeard as my frind in the list I clicked on the "vrongve" username link, which then took me to the about page of that user.
+
+#### Step.4 
+Now the logged in user, which currently is "trongve", is able to press the edit button and then edit the about form for "vrongve.
+
+#### Result:
+- After exploiting the broken access control of the app I was able to entierly delete or modify all the userinfo entered by any user on the profile page in the web application. As long an attacker knows the username the attacker may add the user as friend and then clicking on the username to navigate to the profile page or simply just modifying the URL by changing the username. 
+If an attacker would enter the following URL "http://127.0.0.1:5000/profile/vrongve" the attacker would be able to modify the profile page for that user. 
+
+### 2. Identification and Authentication Failures
+
+Weak password
+
+### 3. Security Misconfiguration
+
+User enumuration
 
 
 ## Black box testing
