@@ -140,16 +140,11 @@ Affected part of the application:
 Solution:
 - Implement session management
 
-### 5. Cryptographic Failures
+### 5. Cryptographic Failures - password hashing
 
-- sqlite flat-file. 
-If downloaded it can be queried
+By looking at the source code it does not seem like the passwords are hashed, which would be counted as an cryptographic failure by OWASP, and it is actually on the second place on the OWASP Top Ten 2023 Vulnerabilities list.
 
-- Are password hashed??
-
-
-
-### 6. File upload
+### 6. File upload - cross site scripting
 
 The web app does not give an guidelines for what kind of files that can be uploaded and not. It looks like the app excepts any kind of file extensions. This means that an attacker might potentially upload malicious and dangenrous files. 
 
@@ -162,7 +157,7 @@ Limit the number of file types that can be uploaded
 
 
 
-### 7. Form validation
+### 7. Form validation - cross site scriptiing
 
 The app lacks form validation. For example the user might share something without actually writing or uploading anything. A solution would be to restrict the user for publishing their thoughts if for instance the text field is empty. 
 
@@ -210,13 +205,32 @@ If an attacker would enter the following URL "http://127.0.0.1:5000/profile/vron
 
 Weak password. Brut force?
 
-### 3. Cross site scripting
+### 3. Cross site scripting #1 - Input form
 
-### 4. Cryptographic Failures
+### 4. Cross site scripting #2 - File upload
 
-Passwords are not hashed
-If attacker gets access to the sqlite file, the attacker will know all the usernames and passwords.
+### 5. Cryptographic Failures - Password storing
 
+#### Step.1 
+I opened the social insecurity app and registered a user by entering firstname: Ola, lastname: Nordmann, username: olanor and password: huskeraldri123.
+
+![Alt text](image.png)
+
+
+#### Step.2 
+After the user-registration I looked around in the source which I have access to and found that a sqlite file was located in the instance folder. After locating this file I went on to download DB Browser (SQLite), which is an open-source and user-friendly tool for working with SQLite databases. The software provides a graphical interface for interacting with SQLite databases, making it easier for users to create, view, edit and manage SQLite database files. 
+
+#### Step.3
+After getting the DB Browser (SQLite) application up and running I went on to open the sqlite file located in the application with the DB Browser software.
+
+![Alt text](image-1.png)
+
+After opening the file i went on to locate the users table and browsed the current data. By browsing the sqlite file used for storing the data in the social insecurity app I could easily see that the password stored where not hashed. 
+
+![Alt text](image-2.png)
+
+#### Result:
+If an attacker where to get access to this sqlite file the attacker would get hold of all the usernames and passwords. The attacker wouldent even have to break the hashing as passwords was stored as plain text. An attacker would get complete control over the app and any user using the app.
 
 ## Black box testing
 
