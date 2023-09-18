@@ -2,67 +2,25 @@
 
 run shift+ctrl+v to visualize the markdown in separate window
 
+export to PDF
+
 ## Introduction
 
 Tester: Vegard Rongve
- 
-Tools and methodology: OWASP Testing Guide
--   Manual inspection
--   Code Review
--   Penetration testing - OWASP Zap
-  
+
 Application: Social Insescurity
 
-EXPLOITED -> UTNYTTES
+Test period: 01.09.2023 - 30.09.2023
 
-Phase 1 Passive mode:
-- In this phase the tester tries to understand the applications logic and plays with the application. (The information gathering section explains how to perform a passive mode test)
+The social insecurity web application is a platform where users can connect with friends and share blog posts, encompassing both textual and image-based content. After uploading a post, other users are allowed to comment on eachothers posts. All users of the app will first need to register before logging in. 
 
-Phase 2 Active mode:
-- In this pahse the tester begins to test using the methodology described in the following sections. The set of active tests have been splite into 11 sub-categories.
-• Information Gathering
-• Configuration and Deployment Management Testing
-• Identity Management Testing
-• Authentication Testing
-• Authorization Testing
-• Session Management Testing
-• Input Validation Testing
-• Error Handling
-• Cryptography
-• Business Logic Testing
-• Client Side Testing
-
-
-Testing Techniques:
-- Manual inspection
-- Code Review
-  - Remove the guess work of black box testing by looking at what is actually going on in the code.
-  - Examples of issues that are particularly conducive to being found through source code reviews include:
-    - concurrency problems
-    - flawed business logic
-    - access control problems
-    - cryptographic weaknesses as well as backdoors
-    - input validation
-- Penetration testing
-  - Penetration testing has been a common technique used to test 
-network security for many years. It is also commonly known as 
-black box testing or ethical hacking. Penetration testing is essentially the “art” of testing a running application remotely to find 
-security vulnerabilities, without knowing the inner workings of 
-the application itself. 
-  -   Typically, the penetration test team would 
-have access to an application as if they were users. The tester acts 
-like an attacker and attempts to find and exploit vulnerabilities. In 
-many cases the tester will be given a valid account on the system
-
-The need for a balanced approach. Need to use manual and automated testing.
-
-Any security issues that are found will be presented to the system owner with an asseessment of the impact, a proposal for mitigation or a technical solution.
-
-## Vulnerability notes:
+The primary ojective of this assignment is to systimatically identify potential vulnerabilities within social insecurity web application, and subsequentially explore methods to exploit them. This assignment is made to improve our abilities to think like potential attackers, with the ultimate aim of enhancing our future application development practice to priotize security or our abilties to work as a penetration tester.
 
 # Vulnerability Assessment
 
-### 1. Weak Password
+## Black Box Testing
+
+### Weak Password
 
 Category: 
 - A07: Identification and Authentication Failures
@@ -76,14 +34,7 @@ Potential Impact:
 Affected part of the application:
 -   The affected part is the registration form of the application where the user is setting a password.
 
-Potential Solution: 
-- Enforcing password complexity
-- Educate users about the importance of strong passwords
-- MFA (multi-factor authentication)
-- Lock out mechanism
-  - If an attacker guesses the password wrong multiple times the account should be locked. Reducing the posibiltiy of successfull brut force attacks.
-
-### 2.User enumeration
+### User enumeration
 
 Category: 
 - A05: Security Misconfiguration
@@ -98,17 +49,13 @@ Potential impact:
 Affected part of the applicaton:
 - The affected part of the app is the login section. The application provides a notification message in the top of the broweser window when an invalid password or username is entered. 
 
-Potential Solution:
-- The application should ensure consistent error messages or responses regardless of whether the username or password is incorrect
-
-
-### 3. Bypassing access control by modifying URL
+### Bypassing access control by modifying URL
 
 Cateogory: 
 - A01:Broken Access Control
 
 Description:
-- By modifying the url, given a valid username, it is possible to login in to the application as that user without entering the password. Given that a valid username is for example "grong", entering the following in the URL "http://127.0.0.1:5000/stream/grong" will access the app as "grong" and navigate the user to the stream page. 
+- By modifying the url, given a valid username, it is possible to login in to the application as that user without entering the password. 
 
 Potential impact:
 - It allows unauthorized access to an account by simply knowing the username, which could lead to unauthorized data access, account manipulation, or other securtiy risks.
@@ -116,10 +63,7 @@ Potential impact:
 Affected part of the application:
 - The Broken Access Control issue affects the user authentication and authorization system of the application. Specifically, it allows unauthorized access to user accounts by manipulating the URL with a valid username, granting access to the user's account without requiring the correct password.
 
-Potential Solution:
-- ??
-
-### 4. Edit another user's profile
+### Edit another user's profile
 
 Cateogory: 
 - A01:Broken Access Control
@@ -137,53 +81,80 @@ Potential impact:
 Affected part of the application:
 - The affected part of the described issue above is the profle page where the user can edit data about their self. 
 
-Solution:
-- Implement session management
 
-### 5. Cryptographic Failures - password hashing
+### File upload
 
-By looking at the source code it does not seem like the passwords are hashed, which would be counted as an cryptographic failure by OWASP, and it is actually on the second place on the OWASP Top Ten 2023 Vulnerabilities list.
+Category:
+- A03:Injection
 
-### 6. File upload - cross site scripting
+Description:
+- The web app does not give an guidelines for what kind of files that can be uploaded and not. It looks like the app excepts any kind of file extensions. This means that an attacker might potentially upload malicious and dangenrous files. 
 
-The web app does not give an guidelines for what kind of files that can be uploaded and not. It looks like the app excepts any kind of file extensions. This means that an attacker might potentially upload malicious and dangenrous files. 
+Potential Impact:
+- Malware distribution. Users can upload malicious files such as viruses, Trojans, or ransomware. These files may be disguised as innocent documents, images, or other harmless formats, making it easier for attackers to spread malware to other users who download or open these files.
+- Uploading certain file types can introduce security vulnerabilities to your server. For example, allowing users to upload scripts (e.g., PHP, JavaScript) can lead to potential code execution vulnerabilities if the server doesn't properly validate and sanitize user inputs.
+- Unrestricted file uploads can result in significant storage costs, especially if users upload large files or upload files at a high volume. This can strain your server's resources and budget.
+- Attackers can conduct attacks such as cross-site scripting by uploading malicous scripts and tricking other users into executing them. By doing so, the attacker could trick the user to give them their password and username.
 
-Is it possible to upload multiple files? If so, all file types need to be checked.
+Affacted part of the application:
+- The affected part the of the application is the stream page, where users can upload a text and/or image which they want others to see. These post will then be visible to all users of the application, meaning that malicious scripts could potenially reach out to all the users.
 
-Limit the number of file types that can be uploaded
+### Injecting code into database
 
-- Category: Insecure File Uploads
-  - Description: Insecure file uploads refer to vulnerabilities where a web application does not adequately validate, sanitize, or secure user-uploaded files. Attackers can exploit these weaknesses to upload malicious files, potentially compromising the integrity and security of the application and its server.
+Category: 
+- A03:Injection
+
+Description
+- Due to bad/no form validation i'm able to post a script to the server by entering the script as text in the comment field on the stream page. And due to the lack of output encoding, the web application threats this a javascript each time the page refreshes.
+
+Potential impact:
+- The script injected to the database could potentially be used to create forms where a user might enter sensitive data and sends it to an attacker when saved. So the potential consquence of these kind of attacks are severe.
+
+Affected part fo the application:
+- The stream page where all the posts are listed.
+- The edit profil page. 
+
+### Form validation
+
+Category: 
+- A04:Insecure design
+
+Description:
+- The app lacks form validation. For example, a user might share something without actually writing or uploading anything on the stream page. A user can also be registered without filling out all the input fields on the registration form.
+
+Potential impact:
+- The potenial impact of bad form validation in these cases are not very big, but the data quality in the web application can become very poor, which might lead to frustrated users and reputation demage.
+
+Affected part of the application:
+- User registration form on the login in page and the stream page where posts are posted.
+
+### Multiple users with same password and username
+
+Category:
+- A04:Insecure desin
 
 
 
-### 7. Form validation - cross site scriptiing
+## White Box Testing
 
-The app lacks form validation. For example the user might share something without actually writing or uploading anything. A solution would be to restrict the user for publishing their thoughts if for instance the text field is empty. 
+### Password hashing
 
-The sign up form can be submitted without any data. This should not be allowed. Also a user can be registered without a first name and last name. This should also not be allowed. Form validation will solve this issue.
+Category:
+- A02:Cryptographic Failures
 
-### 8. Form edit - data erassed when pressing edit button
+Description:
+- By looking at the source code no password hashing are identified, which is counted as an cryptographic failure by OWASP, and it is actually on the second place on the OWASP Top Ten Vulnerabilities list.
 
-### 9. Cross site scripting
+Potential impact:
+- Storing plaintext passwords in a database makes it easier for attackers to steal user credentials if they gain access to the database. A security breach can lead to unauthorized actions taken on behalf of the user.
+- Many users reuse passwords across multiple services. If your application does not hash passwords, attackers can potentially reuse these stolen credentials to access the users account on other platforms
 
-I entered <script>winodow.alert("Dangrous attack!!")</script> into the post comment field an submitted it. This is then saved in the server. And when the list of comments is diplayed, which is done everytime the page loads, the script injected is runned. 
-
-This script could potentially be used to create forms where a user might enter sensitive data and sends it to an attacker when saved.
-
-A script can also be used to steal cookies, session tokens etc. 
-
-Solution: form validation
-validate on server side
-
-### 10. Javascript injection
-
-enter in the browser: javascript: alert("Executed");
-If an alert message pops up, javascript injection can be done.
+Affected part of the application:
+- Register user and login.
 
 # Vulnerability Exploitation
 
-### 1. Broken Access Control (path traversal)
+### 1. Broken Access Control
 
 #### Step.1 
 I registered two user in the app, "vrongve" and "trongve". After registering the two users, i logged in and updated the about page for "vrongve". 
@@ -207,7 +178,49 @@ Weak password. Brut force?
 
 ### 3. Cross site scripting #1 - Input form
 
+#### Step.1 
+I entered <script>window.alert("Dangrous attack!!")</script> into the post comment field on the stream page and submitted the commnet. 
+
+![Alt text](image-3.png)
+
+#### Step.2
+After clicking the 'Post' button, the page refreshes, and an alert popup message appears. This message continues to appear each time the stream page is refreshed.
+Note: A similar behavior can occur on the 'Edit Profile' page due to the absence of form validation and output encoding. Instead of treating the output as text, it's interpreted as JavaScript.
+
+![Alt text](image-4.png)
+
 ### 4. Cross site scripting #2 - File upload
+
+#### Step.1 
+I created an SVG file containing javascript code to simulate a Cross-Site Scripting attack scenario. 
+
+```
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg">
+  <polygon id="triangle" points="0,0 0,50 50,0" fill="#009900" stroke="#004400"/>
+  <script type="text/javascript">
+    alert("XSS by BHARAT");
+  </script>
+</svg>
+```
+
+#### Step.2
+I pressed chose file and then uploaded the malicous-file.svg file which contained the script above.
+
+![Alt text](image-6.png)
+
+#### Step.3
+After posting the file I could see the new post in the list of posts on the stream page. I then right clicked the svg image and pressed "open image in new tab". 
+
+![Alt text](image-5.png)
+
+#### Step.4
+When I open a new tab, I observe that the JavaScript has executed, as indicated by the appearance of a pop-up alert message.
+
+![Alt text](image-7.png)
+
 
 ### 5. Cryptographic Failures - Password storing
 
@@ -215,7 +228,6 @@ Weak password. Brut force?
 I opened the social insecurity app and registered a user by entering firstname: Ola, lastname: Nordmann, username: olanor and password: huskeraldri123.
 
 ![Alt text](image.png)
-
 
 #### Step.2 
 After the user-registration I looked around in the source which I have access to and found that a sqlite file was located in the instance folder. After locating this file I went on to download DB Browser (SQLite), which is an open-source and user-friendly tool for working with SQLite databases. The software provides a graphical interface for interacting with SQLite databases, making it easier for users to create, view, edit and manage SQLite database files. 
@@ -232,25 +244,6 @@ After opening the file i went on to locate the users table and browsed the curre
 #### Result:
 If an attacker where to get access to this sqlite file the attacker would get hold of all the usernames and passwords. The attacker wouldent even have to break the hashing as passwords was stored as plain text. An attacker would get complete control over the app and any user using the app.
 
-## Black box testing
-
-The steps i am doing above is essentially black box testing as I'm testing the web app wihtout looking at any source code. I'm only testing the app by manually clicking around.
-
-## White box testing
-
-White box testing is testing the app while looking at all the source code. Essentially the pen tester have access to everything.
-
-# Assignment Strcuture from Canvas
-
-## Introduction 
-
-Briefly introduce the “Social Insecurity” Flask application and the purpose of the assignment.
-
-## Vulnerability Assessment
-
-1. Conduct a thorough vulnerability assessment of the Flask-based web application. Use both automated scanning tools and manual techniques to identify potential security vulnerabilities.
-2. Document the vulnerabilities you discover along with a brief description of each vulnerability, its potential impact, and the affected part of the application.
-3. Categorize the vulnerabilities based on common vulnerability types (e.g., SQL injection, cross-site scripting, insecure authentication).
 
 ## Vulnerability Exploitation
 
@@ -267,15 +260,6 @@ Discuss the potential consequences if these vulnerabilities were present in a re
 
 Reflect on the challenges you encountered, the tools and techniques you found most effective, and the importance of securing web applications.
 
-# Grading Criteria
-
-Your assignment will be evaluated based on the following criteria:
-
-- Thoroughness of vulnerability assessment
-- Accuracy and effectiveness of vulnerability exploitation
-- Clarity and quality of the report
-- Demonstrated understanding of web application security concepts
-- Creativity in selecting and exploiting vulnerabilities
 
 
 
