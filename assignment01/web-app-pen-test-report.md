@@ -2,7 +2,7 @@
 
 run shift+ctrl+v to visualize the markdown in separate window
 
-export to PDF
+export to PDF. Right click and export to PDF
 
 ## Introduction
 
@@ -117,7 +117,7 @@ Affected part fo the application:
 ### Form validation
 
 Category: 
-- A04:Insecure design
+- A04:Insecure design?
 
 Description:
 - The app lacks form validation. For example, a user might share something without actually writing or uploading anything on the stream page. A user can also be registered without filling out all the input fields on the registration form.
@@ -131,9 +131,16 @@ Affected part of the application:
 ### Multiple users with same password and username
 
 Category:
-- A04:Insecure desin
+- A01:Broken Access Control
 
+Description:
+- In the social security app I have identified a critical usse where system permits the registration of multiple users with identical usernames, lacking essential server-side validation checks to prevent this occurence.
+  
+Potential impact:
+- This vulnerability is severe risk as it leads to confusion among users, making it potentially impossible for a logged-in user to discern their actual identify. Furthermore, when making data modifications, the actions of the one logged-in user affect all users sharing the same username, resulting in significant data loss and integrity compromise.
 
+Affected part of the application:
+- The issue starts with the registration form, where it is possible to register multiple users with the same username. The problem extends throughout the application, impacting all pages where data is modified and stored in the database, as all users sharing the same username are affected.
 
 ## White Box Testing
 
@@ -174,7 +181,52 @@ If an attacker would enter the following URL "http://127.0.0.1:5000/profile/vron
 
 ### 2. Identification and Authentication Failures
 
-Weak password. Brut force?
+#### Step.1 
+Download OZASP Zap and launch the web page through the manual explorer in OWASP Zap. 
+
+![Alt text](image-8.png)
+
+#### Step.2 
+Register a user with username "olanor" and password "abcd1234". 
+
+![Alt text](image-9.png)
+
+After registering the user, try logging in with username "olanor", but set the password equal to "changeme". The application will then tell that the password is incorrect. 
+
+![Alt text](image-10.png)
+
+#### Step.3 
+No i can go into the OWASP Zap application and look at the latest POST request. I highlighted the POST line in the history view and then pressed the "request" tab in the OWASP Zap application. From this view i can see that the username entered was "olenor" and the password entered was "changeme". 
+
+![Alt text](image-11.png)
+
+#### Step.4 
+After locating the "changeme" password I highlighted "changeme" and right-clicked. Then i selected "Fuzz" -> "Add" -> "Add" -> Type "File".
+
+![Alt text](image-12.png)
+
+![Alt text](image-13.png)
+
+![Alt text](image-14.png)
+
+![Alt text](image-15.png)
+
+After selecting as type I pressed the select file which open a file explorer. Then i located the password wordlist I had downloaded earlier and uploaded that file to OWASP Zap.
+
+![Alt text](image-16.png)
+
+After uploading the file i pressed "Start fuzzer". OWASP Zap then starts to test all the different passwords listed in the uploaded file. 
+
+![Alt text](image-17.png)
+
+#### Step.5 
+When OWASP Zap completed the testing I sorted the tests based on body size and found that there was one test that stod out. I then looked at the value in the payloads column and could see that the one that stod out was the correct password for that username. 
+
+![Alt text](image-18.png)
+
+#### Result
+
+Because the social insecurity application stores passwords in plaintext without any password requirements, and it confirms the validity of a username, it is highly vulnerable to brute-force attacks. So by using a brut force technique i was able to defeat the authenticaion mechanism of the application.
 
 ### 3. Cross site scripting #1 - Input form
 
@@ -188,6 +240,10 @@ After clicking the 'Post' button, the page refreshes, and an alert popup message
 Note: A similar behavior can occur on the 'Edit Profile' page due to the absence of form validation and output encoding. Instead of treating the output as text, it's interpreted as JavaScript.
 
 ![Alt text](image-4.png)
+
+#### Result:
+
+This exploitation shows that the application is vulnerable for cross site scripting which could lead to attackers stealing sensitive user data, such as login credentials, session cookies or personal information. 
 
 ### 4. Cross site scripting #2 - File upload
 
@@ -221,8 +277,11 @@ When I open a new tab, I observe that the JavaScript has executed, as indicated 
 
 ![Alt text](image-7.png)
 
+#### Result:
 
-### 5. Cryptographic Failures - Password storing
+This exploitation shows that the application is vulnerable for cross site scripting which could lead to attackers stealing sensitive user data, such as login credentials, session cookies or personal information. 
+
+### 5. Cryptographic Failures
 
 #### Step.1 
 I opened the social insecurity app and registered a user by entering firstname: Ola, lastname: Nordmann, username: olanor and password: huskeraldri123.
@@ -244,21 +303,63 @@ After opening the file i went on to locate the users table and browsed the curre
 #### Result:
 If an attacker where to get access to this sqlite file the attacker would get hold of all the usernames and passwords. The attacker wouldent even have to break the hashing as passwords was stored as plain text. An attacker would get complete control over the app and any user using the app.
 
-
-## Vulnerability Exploitation
-
-1. Select at least five distinct vulnerabilities that you have identified.
-2. Choose appropriate penetration testing tools (such as Metasploit, Burp Suite, OWASP Zap, sqlmap) and techniques to exploit these vulnerabilities.
-3. Clearly document the steps you took to exploit each vulnerability, including any commands, payloads, or configurations used. These instructions should be detailed enough for the teaching assistants or the lecturers to reproduce your attack.
-4. Explain the results of each successful exploitation, including the extent of the compromise, potential data accessed, and system control achieved.
-
 ## Impact Analysis
 
 Discuss the potential consequences if these vulnerabilities were present in a real-world application.
 
-## Lessons Learned
+#### 1. Cross site scripting
+Potential consequence if a real world application has the same cross site scripting vulnerabiltiy as identified in the social insecurity application.
+-  Data tefth:
+Attackers can steal sensitive user data, such as login credentials, session cookies, or personal information, by injecting malicious scripts into a website.
+-  Phising:
+Attackers can create convincing phishing pages by injecting malicious scripts into legitimate websites. Users may unknowingly enter their credentials or sensitive information on these fake pages.
+- Clickjacking:
+Attackers can overlay malicious content on a legitimate website, tricking users into clicking on elements that perform unintended actions without their knowledge.
+- Data manipulation:
+XSS can be used to modify data within a web application, potentially leading to data corruption or unauthorized changes.
 
-Reflect on the challenges you encountered, the tools and techniques you found most effective, and the importance of securing web applications.
+#### 2. Broken access control
+Potential consequence if a real world application has the same broke access control vulnerabiltiy as identified in the social insecurity application.
+- Unauthorized data access:
+Attackers can access sensitive information and data belonging to other users, violating their privacy. This information may include personal details, contact information, or confidential data.
+- Data modification:
+Attackers can maliciously modify or delete data within another user's profile. This could lead to data corruption, loss of information, or unauthorized changes to user settings.
+- Reputation demage:
+Users affected by this vulnerability may lose trust in the web application and the organization running it, leading to reputational damage and a loss of customers or users.
+- Finacial loss:
+Security breaches, especially those leading to data theft or fraudulent activities, can result in financial losses for both the affected users and the organization responsible for the application
+
+#### 3. Cryptograpic Failures
+Potential consequence if a real world application has cryptograpic failures.
+- Data exposure:
+Attackers may gain access to encrypted data and, through cryptographic weaknesses, decrypt it to reveal sensitive information. This could include personally identifiable information (PII), financial data, or confidential business data.
+- Access to passwords and usernames: 
+If a real world application did not hash the passwords stored, an attacker could potentially read all usernames and passwords if the attacker where to get hold of the file storing the data.
+
+#### 4. Idetification and authentication
+Identification and authentication vulnerabilities in a web application can have significant and wide-ranging consequences, especially if they lead to weak passwords and make brute-forcing attacks easier.
+- Unauthorized access:
+Weak authentication mechanisms can allow attackers to gain unauthorized access to user accounts, systems, or sensitive data within the application.
+- Data breach:
+Attackers who successfully exploit identification and authentication vulnerabilities can access and potentially steal sensitive user data, such as personal information, financial data, or confidential documents.
+
+# Lessons Learned
+
+In the course of this project, several valuable insights and lessons were gained, shedding light on both the challenges faced and the effective tools and techniques employed in the process of securing web applications.
+
+## Tool Selection: 
+The primary tools utilized for this project were web browsers and OWASP Zap. While web browsers provided a practical means to explore the application from an attacker's perspective, OWASP Zap offered an automated approach to vulnerability detection and exploitation. The combination of these tools allowed for a comprehensive assessment of the web application's security posture.
+
+## Attacker's Perspective: 
+One of the most effective techniques employed was approaching the application with an attacker's mindset. This approach proved to be invaluable in uncovering vulnerabilities that might otherwise go unnoticed.
+
+## Challenges with OWASP Zap: 
+The project also highlighted certain challenges, particularly in regards to using OWASP Zap. These challenges were primarily rooted in the lack of prior exposure and training. Unfortunately, due to unavailability and the absence of recorded lectures, acquiring proficiency in OWASP Zap was more challenging than anticipated.
+
+## Knowledge Acquisition: 
+Despite the challenges, the project provided a significant learning opportunity. A deeper understanding of the various ways in which web applications can be exploited was acquired. This newfound knowledge is valuable and will be leveraged in future web application developments.
+
+In conclusion, this project served as a valuable learning experience, highlighting the significance of adopting an attacker's perspective, the challenges associated with security tools, and the critical need for ongoing education and awareness in the field of web application security.
 
 
 
