@@ -1,8 +1,7 @@
 # Social Insecurity - Penetration Testing Report
 
-run shift+ctrl+v to visualize the markdown in separate window
-
-export to PDF. Right click and export to PDF
+Single group: Vegard Rongve 
+Student number: 225590
 
 ## Introduction
 
@@ -10,7 +9,7 @@ Tester: Vegard Rongve
 
 Application: Social Insescurity
 
-Test period: 01.09.2023 - 30.09.2023
+Test period: 01.09.2023 - 27.09.2023
 
 The social insecurity web application is a platform where users can connect with friends and share blog posts, encompassing both textual and image-based content. After uploading a post, other users are allowed to comment on eachothers posts. All users of the app will first need to register before logging in. 
 
@@ -20,7 +19,7 @@ The primary ojective of this assignment is to systimatically identify potential 
 
 ## Black Box Testing
 
-### Weak Password
+## Weak Password
 
 Category: 
 - A07: Identification and Authentication Failures
@@ -29,12 +28,14 @@ Descirption:
 - Users of the application have complete freedom to choose their own passwords, without any strict password policy in place. This means they can even select a single-letter password.
 
 Potential Impact:
-- The potential impact of having a weak password is significant, as an attacker might get hold sensitiv data (depending on the purpose of the application). An attacker can by using for instance the brut force technique relatively easy break the password and get access to a user account (given that the attacker knows the username). 
+- The potential impact of having a weak password is significant, as an attacker might get hold sensitiv data (depending on the purpose of the application). An attacker can by using for instance the brut force technique, relatively easy break the password and get access to a user account.
+- 
 
 Affected part of the application:
 -   The affected part is the registration form of the application where the user is setting a password.
 
-### User enumeration
+
+## User enumeration
 
 Category: 
 - A05: Security Misconfiguration
@@ -49,7 +50,7 @@ Potential impact:
 Affected part of the applicaton:
 - The affected part of the app is the login section. The application provides a notification message in the top of the broweser window when an invalid password or username is entered. 
 
-### Bypassing access control by modifying URL
+## Bypassing access control by modifying URL
 
 Cateogory: 
 - A01:Broken Access Control
@@ -63,7 +64,7 @@ Potential impact:
 Affected part of the application:
 - The Broken Access Control issue affects the user authentication and authorization system of the application. Specifically, it allows unauthorized access to user accounts by manipulating the URL with a valid username, granting access to the user's account without requiring the correct password.
 
-### Edit another user's profile
+## Edit another user's profile
 
 Cateogory: 
 - A01:Broken Access Control
@@ -82,30 +83,29 @@ Affected part of the application:
 - The affected part of the described issue above is the profle page where the user can edit data about their self. 
 
 
-### File upload
+## File upload
 
 Category:
 - A03:Injection
 
 Description:
-- The web app does not give an guidelines for what kind of files that can be uploaded and not. It looks like the app excepts any kind of file extensions. This means that an attacker might potentially upload malicious and dangenrous files. 
+- The web app does not give an guidelines for what kind of files that can be uploaded and not. It looks like the app accepts any kind of file extensions. This means that an attacker might potentially upload malicious and dangenrous files. 
 
 Potential Impact:
 - Malware distribution. Users can upload malicious files such as viruses, Trojans, or ransomware. These files may be disguised as innocent documents, images, or other harmless formats, making it easier for attackers to spread malware to other users who download or open these files.
 - Uploading certain file types can introduce security vulnerabilities to your server. For example, allowing users to upload scripts (e.g., PHP, JavaScript) can lead to potential code execution vulnerabilities if the server doesn't properly validate and sanitize user inputs.
-- Unrestricted file uploads can result in significant storage costs, especially if users upload large files or upload files at a high volume. This can strain your server's resources and budget.
-- Attackers can conduct attacks such as cross-site scripting by uploading malicous scripts and tricking other users into executing them. By doing so, the attacker could trick the user to give them their password and username.
+
 
 Affacted part of the application:
 - The affected part the of the application is the stream page, where users can upload a text and/or image which they want others to see. These post will then be visible to all users of the application, meaning that malicious scripts could potenially reach out to all the users.
 
-### Injecting code into database
+## Injecting code into database
 
 Category: 
 - A03:Injection
 
 Description
-- Due to bad/no form validation i'm able to post a script to the server by entering the script as text in the comment field on the stream page. And due to the lack of output encoding, the web application threats this a javascript each time the page refreshes.
+- Due to bad/no form validation i'm able to post a script to the server by entering the script as text in the comment field on the stream page. And due to the lack of output encoding, the web application threats this as a javascript each time the page refreshes.
 
 Potential impact:
 - The script injected to the database could potentially be used to create forms where a user might enter sensitive data and sends it to an attacker when saved. So the potential consquence of these kind of attacks are severe.
@@ -114,27 +114,13 @@ Affected part fo the application:
 - The stream page where all the posts are listed.
 - The edit profil page. 
 
-### Form validation
-
-Category: 
-- A04:Insecure design?
-
-Description:
-- The app lacks form validation. For example, a user might share something without actually writing or uploading anything on the stream page. A user can also be registered without filling out all the input fields on the registration form.
-
-Potential impact:
-- The potenial impact of bad form validation in these cases are not very big, but the data quality in the web application can become very poor, which might lead to frustrated users and reputation demage.
-
-Affected part of the application:
-- User registration form on the login in page and the stream page where posts are posted.
-
-### Multiple users with same password and username
+## Multiple users with same password and username
 
 Category:
 - A01:Broken Access Control
 
 Description:
-- In the social security app I have identified a critical usse where system permits the registration of multiple users with identical usernames, lacking essential server-side validation checks to prevent this occurence.
+- In the social security app, I have identified a critical issue. The system allows the registration of multiple users with identical usernames due to a lack of essential server-side validation checks
   
 Potential impact:
 - This vulnerability is severe risk as it leads to confusion among users, making it potentially impossible for a logged-in user to discern their actual identify. Furthermore, when making data modifications, the actions of the one logged-in user affect all users sharing the same username, resulting in significant data loss and integrity compromise.
@@ -144,7 +130,7 @@ Affected part of the application:
 
 ## White Box Testing
 
-### Password hashing
+## Password hashing
 
 Category:
 - A02:Cryptographic Failures
@@ -161,7 +147,7 @@ Affected part of the application:
 
 # Vulnerability Exploitation
 
-### 1. Broken Access Control
+## 1. Broken Access Control
 
 #### Step.1 
 I registered two user in the app, "vrongve" and "trongve". After registering the two users, i logged in and updated the about page for "vrongve". 
@@ -179,7 +165,7 @@ Now the logged in user, which currently is "trongve", is able to press the edit 
 - After exploiting the broken access control of the app I was able to entierly delete or modify all the userinfo entered by any user on the profile page in the web application. As long an attacker knows the username the attacker may add the user as friend and then clicking on the username to navigate to the profile page or simply just modifying the URL by changing the username. 
 If an attacker would enter the following URL "http://127.0.0.1:5000/profile/vrongve" the attacker would be able to modify the profile page for that user. 
 
-### 2. Identification and Authentication Failures
+## 2. Identification and Authentication Failures
 
 #### Step.1 
 Download OZASP Zap and launch the web page through the manual explorer in OWASP Zap. 
@@ -228,7 +214,7 @@ When OWASP Zap completed the testing I sorted the tests based on body size and f
 
 Because the social insecurity application stores passwords in plaintext without any password requirements, and it confirms the validity of a username, it is highly vulnerable to brute-force attacks. So by using a brut force technique i was able to defeat the authenticaion mechanism of the application.
 
-### 3. Cross site scripting #1 - Input form
+## 3. Cross site scripting #1 - Input form
 
 #### Step.1 
 I entered <script>window.alert("Dangrous attack!!")</script> into the post comment field on the stream page and submitted the commnet. 
@@ -245,7 +231,7 @@ Note: A similar behavior can occur on the 'Edit Profile' page due to the absence
 
 This exploitation shows that the application is vulnerable for cross site scripting which could lead to attackers stealing sensitive user data, such as login credentials, session cookies or personal information. 
 
-### 4. Cross site scripting #2 - File upload
+## 4. Cross site scripting #2 - File upload
 
 #### Step.1 
 I created an SVG file containing javascript code to simulate a Cross-Site Scripting attack scenario. 
@@ -281,7 +267,7 @@ When I open a new tab, I observe that the JavaScript has executed, as indicated 
 
 This exploitation shows that the application is vulnerable for cross site scripting which could lead to attackers stealing sensitive user data, such as login credentials, session cookies or personal information. 
 
-### 5. Cryptographic Failures
+## 5. Cryptographic Failures
 
 #### Step.1 
 I opened the social insecurity app and registered a user by entering firstname: Ola, lastname: Nordmann, username: olanor and password: huskeraldri123.
@@ -307,7 +293,7 @@ If an attacker where to get access to this sqlite file the attacker would get ho
 
 Discuss the potential consequences if these vulnerabilities were present in a real-world application.
 
-#### 1. Cross site scripting
+### 1. Cross site scripting
 Potential consequence if a real world application has the same cross site scripting vulnerabiltiy as identified in the social insecurity application.
 -  Data tefth:
 Attackers can steal sensitive user data, such as login credentials, session cookies, or personal information, by injecting malicious scripts into a website.
@@ -318,7 +304,7 @@ Attackers can overlay malicious content on a legitimate website, tricking users 
 - Data manipulation:
 XSS can be used to modify data within a web application, potentially leading to data corruption or unauthorized changes.
 
-#### 2. Broken access control
+### 2. Broken access control
 Potential consequence if a real world application has the same broke access control vulnerabiltiy as identified in the social insecurity application.
 - Unauthorized data access:
 Attackers can access sensitive information and data belonging to other users, violating their privacy. This information may include personal details, contact information, or confidential data.
@@ -329,34 +315,34 @@ Users affected by this vulnerability may lose trust in the web application and t
 - Finacial loss:
 Security breaches, especially those leading to data theft or fraudulent activities, can result in financial losses for both the affected users and the organization responsible for the application
 
-#### 3. Cryptograpic Failures
+### 3. Cryptograpic Failures
 Potential consequence if a real world application has cryptograpic failures.
 - Data exposure:
 Attackers may gain access to encrypted data and, through cryptographic weaknesses, decrypt it to reveal sensitive information. This could include personally identifiable information (PII), financial data, or confidential business data.
 - Access to passwords and usernames: 
 If a real world application did not hash the passwords stored, an attacker could potentially read all usernames and passwords if the attacker where to get hold of the file storing the data.
 
-#### 4. Idetification and authentication
+### 4. Idetification and authentication
 Identification and authentication vulnerabilities in a web application can have significant and wide-ranging consequences, especially if they lead to weak passwords and make brute-forcing attacks easier.
 - Unauthorized access:
 Weak authentication mechanisms can allow attackers to gain unauthorized access to user accounts, systems, or sensitive data within the application.
 - Data breach:
 Attackers who successfully exploit identification and authentication vulnerabilities can access and potentially steal sensitive user data, such as personal information, financial data, or confidential documents.
 
-# Lessons Learned
+## Lessons Learned
 
 In the course of this project, several valuable insights and lessons were gained, shedding light on both the challenges faced and the effective tools and techniques employed in the process of securing web applications.
 
-## Tool Selection: 
+### Tool Selection: 
 The primary tools utilized for this project were web browsers and OWASP Zap. While web browsers provided a practical means to explore the application from an attacker's perspective, OWASP Zap offered an automated approach to vulnerability detection and exploitation. The combination of these tools allowed for a comprehensive assessment of the web application's security posture.
 
-## Attacker's Perspective: 
+### Attacker's Perspective: 
 One of the most effective techniques employed was approaching the application with an attacker's mindset. This approach proved to be invaluable in uncovering vulnerabilities that might otherwise go unnoticed.
 
-## Challenges with OWASP Zap: 
+### Challenges with OWASP Zap: 
 The project also highlighted certain challenges, particularly in regards to using OWASP Zap. These challenges were primarily rooted in the lack of prior exposure and training. Unfortunately, due to unavailability and the absence of recorded lectures, acquiring proficiency in OWASP Zap was more challenging than anticipated.
 
-## Knowledge Acquisition: 
+### Knowledge Acquisition: 
 Despite the challenges, the project provided a significant learning opportunity. A deeper understanding of the various ways in which web applications can be exploited was acquired. This newfound knowledge is valuable and will be leveraged in future web application developments.
 
 In conclusion, this project served as a valuable learning experience, highlighting the significance of adopting an attacker's perspective, the challenges associated with security tools, and the critical need for ongoing education and awareness in the field of web application security.
